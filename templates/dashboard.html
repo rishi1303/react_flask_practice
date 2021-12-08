@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Dashboard</title>
-    </head>
-    <body>
-        <h1> Welcome {{ data }} </h1>
-    </body>
+{%include "header.html" %}
+
+<body>
+    {%include "navbar.html" %}
+    <div class="contain">
+    <h1> Welcome {{ data }} </h1>
+    </div>
+    {%include "footer.html" %}
+</body>
+
 </html>

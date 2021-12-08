@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 import hashlib, jwt, werkzeug
+from flask.helpers import url_for
+from flask import request, session, url_for, make_response
 import logging
 
 from flask.cli import DispatchingApp
@@ -7,6 +9,7 @@ from flask.cli import DispatchingApp
 from flask.json import jsonify
 from flask import app, request, make_response,Response
 from flask.templating import render_template
+from werkzeug.utils import redirect
 from models import *
 from functools import wraps
 
@@ -18,13 +21,15 @@ db.create_all()
 db.session.commit()
 
 app.config['SECRET_KEY'] = 'keyissecured12123'
-
+token=''
 
 # decorator for verifying the JWT
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.args.get('jwt') 
+        # token = request.args.get('jwt') 
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
         # return 401 if token is not passed
         if not token:
             return jsonify({'message' : 'Token is missing !!'}), 401
@@ -71,10 +76,10 @@ def loginPage():
 def adminPage():
     app.logger.info('Info level log')
     app.logger.warning('Warning level log')
-    return render_template('login.html')
+    return render_template('adminlogin.html')
 
 #creating admin page
-@app.route('/admin/edit')
+@app.route('/adminpage')
 def adminFormPage():
     app.logger.info('Info level log')
     app.logger.warning('Warning level log')
@@ -107,6 +112,26 @@ def registerSuccess():
         db.session.commit()
     return render_template('login.html')
 
+
+@app.route('/editsuccess', methods=["POST"])
+def editSuccess():
+    # app.logger.info('Info level log')
+    # app.logger.warning('Warning level log')
+    if request.method == "POST":
+        id = request.form.get('id')
+        title = request.form.get('title')
+        categories = request.form.get('categories')
+        tags = request.form.get('tags')
+        link = request.form.get('link')
+        type = request.form.get('type')
+        featured = request.form.get('featured')
+        level = request.form.get('level')
+
+        entry = AdminSuccess(id=id,title=title,categories=categories, tags=tags, link=link, type=type,featured=featured, level=level)
+        db.session.add(entry)
+        db.session.commit()
+    return render_template('dashboard.html')
+
 @app.route('/loginsuccess', methods=['POST'])
 def loginSucess():
     if request.method == 'POST':
@@ -121,8 +146,9 @@ def loginSucess():
                 print(row.email)
                 token = jwt.encode({'user':row.email, 'exp': datetime.utcnow()+timedelta(minutes=15)}, app.config['SECRET_KEY'])
                 token= token.decode('utf-8')
-                # print(jsonify({'jwt' : str(token)}))
-                return make_response(jsonify({'jwt' : token}), 201)
+                # return redirect(url_for('dashboard'))
+                # session['jwt']=token
+                return make_response(jsonify({'jwt':token}), 201)
     return make_response('could not verify', 401, {'WWW-Authenticate':'Basic="Login Required"'})
 
 @app.route('/adminsuccess', methods=['POST'])
@@ -130,18 +156,24 @@ def adminSucess():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
+        print(password)
         #hashing the input and comparing the hash
         hashedPassword = hashlib.md5(password.encode())
         # result = hashlib.md5(str2hash.encode())
         hashedPassword = hashedPassword.hexdigest()
-        result = db.session.query(Users).filter(Users.email==email, Users.password==hashedPassword)
+        result = db.session.query(Admins).filter(Admins.email==email, Admins.password==password)
         for row in result:
             if (len(row.email)!=0):
                 print(row.email)
-                token = jwt.encode({'user':row.email, 'exp': datetime.utcnow()+timedelta(minutes=15)}, app.config['SECRET_KEY'])
-                print("Token ",token)
-                return make_response(jsonify({'jwt' : str(token)}), 201)
-    return make_response('could not verify', 401, {'WWW-Authenticate':'Basic="Login Required"'})
+                # token = jwt.encode({'user':row.email, 'exp': datetime.utcnow()+timedelta(minutes=15)}, app.config['SECRET_KEY'])
+                # print("Token ",token)
+                # token= token.decode('utf-8')
+                # session['jwt']=token
+                # return redirect(url_for('adminpage'))
+                return render_template("adminForm.html")
+                # return make_response(jsonify({'jwt' : token}), 201)
+    return render_template("index.html")
+    # return make_response('could not verify', 401, {'WWW-Authenticate':'Basic="Login Required"'})
 
 
 @app.route('/dashboard')
@@ -165,7 +197,7 @@ app.register_error_handler(404,notFound )
 #HTTP Codes https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=8001)
 
 #logging -> reference https://www.askpython.com/python-modules/flask/flask-logging
 # Five levels of debugging

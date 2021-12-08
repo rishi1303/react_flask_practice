@@ -1,23 +1,78 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Learning Flask</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    </head>
-    
-    <body style="text-align: center; margin-top: 150px;">
-    <form action="/registersuccess" method="POST">
-      <input type="text" name="name" placeholder="Title"><br>
-      <input type="text" name="Tags" placeholder="Tags"><br>
-      <input type="text" name="Categories" placeholder="Categories"><br>
-      <input type="text" name="Link" placeholder="Link"><br>
-      <input type="text" name="Type" placeholder="Type"><br>
-      <input type="text" name="Feature" placeholder="Feature"><br>
-      <input type="text" name="Levels" placeholder="Levels"><br>
-      <input type="submit" id="Submit" value="Submit">
-    </form>
-  
-  
-  
-  </body>
+{%include "header.html" %}
+
+<body >
+  {%include "navbar.html" %}
+  <div class="container mt-5">
+    <div class="card">
+      <h5 class="bg-green card-header text-center">Login Page</h5>
+      <div class="card-body">
+        <form role="form" data-toggle="validator" action="/editsuccess" method="POST">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control" data-error="You must have a title."
+              placeholder="Title" required>
+
+            <!-- Error -->
+            <div class="help-block with-errors"></div>
+          </div>
+          <div class="form-group">
+            <label>Categories</label>
+            <input type="text" name="categories" class="form-control" data-error="You must have a Categories."
+              placeholder="Categories" required>
+
+            <!-- Error -->
+            <div class="help-block with-errors"></div>
+          </div>
+          <div class="form-group">
+            <label>Tags</label>
+            <input type="text" name="tags" class="form-control" data-error="You must have a Tags."
+              placeholder="Tags" required>
+
+            <!-- Error -->
+            <div class="help-block with-errors"></div>
+          </div>
+          <div class="form-group">
+            <label>Link</label>
+            <input type="text" name="link" class="form-control" data-error="You must have a Link." placeholder="Link"
+              required>
+
+            <!-- Error -->
+            <div class="help-block with-errors"></div>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <input type="text" name="type" class="form-control" data-error="You must have a Type." placeholder="Type"
+              required>
+
+            <!-- Error -->
+            <div class="help-block with-errors"></div>
+          </div>
+          <div class="form-group">
+            <label>Featured</label>
+            <input type="text" name="featured" class="form-control" data-error="You must have a Featured."
+              placeholder="Featured" required>
+
+            <!-- Error -->
+            <div class="help-block with-errors"></div>
+          </div>
+          <div class="form-group">
+            <label>Levels</label>
+            <input type="text" name="level" class="form-control" data-error="You must have a Levels."
+              placeholder="Levels" required>
+
+            <!-- Error -->
+            <div class="help-block with-errors"></div>
+          </div>
+          <div class="form-group text-center">
+            <button class="btn btn-primary" type="submit">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {%include "footer.html" %}
+</body>
+
 </html>
